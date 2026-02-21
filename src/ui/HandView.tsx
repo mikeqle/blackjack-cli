@@ -18,18 +18,34 @@ export function HandView({ title, cards, hiddenIndex, active = false, outcome }:
   const score = scoreHand(visibleCards);
 
   return (
-    <Box flexDirection="column" marginBottom={1} borderStyle="round" borderColor={active ? "yellow" : "gray"} paddingX={1}>
-      <Text color={active ? "yellow" : "cyan"}>{title}</Text>
-      <Box>
+    <Box
+      flexDirection="column"
+      marginBottom={1}
+      borderStyle="round"
+      borderColor={active ? "yellowBright" : "cyan"}
+      paddingX={2}
+      paddingY={1}
+    >
+      <Text color={active ? "yellowBright" : "cyanBright"} bold>
+        {title}
+      </Text>
+      <Box marginTop={1} marginBottom={1}>
         {cards.map((card, idx) => (
           <CardView key={`${card.rank}-${card.suit}-${idx}`} card={card} hidden={idx === hiddenIndex} />
         ))}
       </Box>
       <Text>
-        Total: {hiddenIndex === undefined ? score.total : "?"}
+        <Text color="white" bold>
+          Total:
+        </Text>{" "}
+        <Text color="white">{hiddenIndex === undefined ? score.total : "?"}</Text>
         {hiddenIndex === undefined && score.soft ? " (soft)" : ""}
       </Text>
-      {outcome ? <Text color={outcome === "lose" ? "red" : outcome === "push" ? "yellow" : "green"}>Outcome: {outcome}</Text> : null}
+      {outcome ? (
+        <Text color={outcome === "lose" ? "redBright" : outcome === "push" ? "yellowBright" : "greenBright"}>
+          <Text bold>Outcome:</Text> {outcome.toUpperCase()}
+        </Text>
+      ) : null}
     </Box>
   );
 }

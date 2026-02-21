@@ -1,4 +1,4 @@
-import { Box, Newline, Text, useApp, useInput } from "ink";
+import { Box, Text, useApp, useInput } from "ink";
 import React, { useEffect, useMemo, useState } from "react";
 import { BlackjackGame } from "../engine/game";
 import { FooterHelp } from "./FooterHelp";
@@ -56,45 +56,63 @@ export function GameApp() {
   const revealDealer = game.shouldRevealDealer();
 
   return (
-    <Box flexDirection="column" padding={1}>
-      <Text color="magentaBright">CLI Blackjack</Text>
-      <StatusPanel snapshot={snapshot} />
+    <Box flexDirection="column" paddingX={2} paddingY={1}>
+      <Box marginBottom={1}>
+        <Text color="magentaBright" bold>
+          CLI BLACKJACK
+        </Text>
+      </Box>
 
-      <HandView
-        title="Dealer"
-        cards={snapshot.dealerCards}
-        hiddenIndex={revealDealer ? undefined : 1}
-      />
+      <Box marginBottom={1}>
+        <StatusPanel snapshot={snapshot} />
+      </Box>
 
-      {snapshot.playerHands.map((hand, idx) => (
+      <Box flexDirection="column" marginBottom={1}>
         <HandView
-          key={`hand-${idx}`}
-          title={`Player Hand ${idx + 1} (${hand.bet})`}
-          cards={hand.cards}
-          active={snapshot.phase === "player_turn" && snapshot.activeHandIndex === idx}
-          outcome={snapshot.phase === "round_over" || snapshot.phase === "game_over" ? hand.outcome : undefined}
+          title="Dealer"
+          cards={snapshot.dealerCards}
+          hiddenIndex={revealDealer ? undefined : 1}
         />
-      ))}
+      </Box>
 
-      <Text>
-        <Text color="cyan">Status:</Text> {snapshot.message}
-      </Text>
+      <Box flexDirection="column" marginBottom={1}>
+        {snapshot.playerHands.map((hand, idx) => (
+          <HandView
+            key={`hand-${idx}`}
+            title={`Player Hand ${idx + 1} (${hand.bet})`}
+            cards={hand.cards}
+            active={snapshot.phase === "player_turn" && snapshot.activeHandIndex === idx}
+            outcome={snapshot.phase === "round_over" || snapshot.phase === "game_over" ? hand.outcome : undefined}
+          />
+        ))}
+      </Box>
+
+      <Box marginBottom={1}>
+        <Text>
+          <Text color="cyanBright" bold>
+            STATUS
+          </Text>
+          <Text color="white">  {snapshot.message}</Text>
+        </Text>
+      </Box>
 
       {snapshot.phase === "round_over" ? (
-        <Text color="yellow">
-          <Newline />
-          Press <Text color="white">n</Text> to start the next round.
-        </Text>
+        <Box marginBottom={1}>
+          <Text color="yellowBright">
+            <Text bold>NEXT ROUND</Text>  Press <Text color="white" bold>n</Text> to continue.
+          </Text>
+        </Box>
       ) : null}
 
       {snapshot.phase === "game_over" ? (
-        <Text color="red">
-          <Newline />
-          Out of bankroll. Press <Text color="white">q</Text> to quit.
-        </Text>
+        <Box marginBottom={1}>
+          <Text color="redBright">
+            <Text bold>GAME OVER</Text>  Out of bankroll. Press <Text color="white" bold>q</Text> to quit.
+          </Text>
+        </Box>
       ) : null}
 
-      <Box marginTop={1}>
+      <Box marginTop={1} marginBottom={1}>
         <FooterHelp phase={snapshot.phase} canDouble={game.canDoubleDown()} canSplit={game.canSplit()} />
       </Box>
     </Box>

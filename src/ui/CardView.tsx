@@ -11,14 +11,14 @@ interface CardViewProps {
 export function CardView({ card, hidden = false }: CardViewProps) {
   if (hidden || !card) {
     return (
-      <Box marginRight={1}>
-        <Text color="gray">[??]</Text>
+      <Box marginRight={2}>
+        <Text color="white">[??]</Text>
       </Box>
     );
   }
 
   return (
-    <Box marginRight={1}>
+    <Box marginRight={2}>
       <Text color={SUIT_COLOR[card.suit] === "red" ? "red" : "white"}>
         [{card.rank}
         {SUIT_SYMBOL[card.suit]}]

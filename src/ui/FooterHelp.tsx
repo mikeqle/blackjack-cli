@@ -9,23 +9,93 @@ interface FooterHelpProps {
 }
 
 export function FooterHelp({ phase, canDouble, canSplit }: FooterHelpProps) {
-  let content = "q Quit";
+  const key = (value: string) => (
+    <Text color="white" bold>
+      {value}
+    </Text>
+  );
 
-  if (phase === "betting") {
-    content = "←/→ Bet -/+10  |  ↓/↑ Bet -/+50  |  Enter Deal  |  q Quit";
-  } else if (phase === "player_turn") {
-    content = `h Hit  |  s Stand  |  d Double ${canDouble ? "" : "(N/A)"}  |  p Split ${canSplit ? "" : "(N/A)"}  |  q Quit`;
-  } else if (phase === "dealer_turn") {
-    content = "Dealer playing...";
-  } else if (phase === "round_over") {
-    content = "n Next round  |  q Quit";
-  } else if (phase === "game_over") {
-    content = "Game over: q Quit";
-  }
+  const label = (value: string) => <Text color="cyanBright">{value}</Text>;
+
+  const separator = <Text color="gray">  |  </Text>;
 
   return (
-    <Box borderStyle="single" borderColor="gray" paddingX={1}>
-      <Text color="gray">{content}</Text>
+    <Box flexDirection="column" borderStyle="round" borderColor="cyan" paddingX={2} paddingY={1}>
+      <Box marginBottom={1}>
+        <Text color="cyanBright" bold>
+          CONTROLS
+        </Text>
+      </Box>
+
+      {phase === "betting" ? (
+        <Text>
+          {key("←/→")}
+          <Text> </Text>
+          {label("Bet -/+10")}
+          {separator}
+          {key("↓/↑")}
+          <Text> </Text>
+          {label("Bet -/+50")}
+          {separator}
+          {key("Enter/Space")}
+          <Text> </Text>
+          {label("Deal")}
+          {separator}
+          {key("q")}
+          <Text> </Text>
+          {label("Quit")}
+        </Text>
+      ) : null}
+
+      {phase === "player_turn" ? (
+        <Text>
+          {key("h")}
+          <Text> </Text>
+          {label("Hit")}
+          {separator}
+          {key("s")}
+          <Text> </Text>
+          {label("Stand")}
+          {separator}
+          {key("d")}
+          <Text> </Text>
+          {label(`Double${canDouble ? "" : " (N/A)"}`)}
+          {separator}
+          {key("p")}
+          <Text> </Text>
+          {label(`Split${canSplit ? "" : " (N/A)"}`)}
+          {separator}
+          {key("q")}
+          <Text> </Text>
+          {label("Quit")}
+        </Text>
+      ) : null}
+
+      {phase === "dealer_turn" ? (
+        <Text color="yellowBright">
+          <Text bold>WAIT</Text>  Dealer playing...
+        </Text>
+      ) : null}
+
+      {phase === "round_over" ? (
+        <Text>
+          {key("n")}
+          <Text> </Text>
+          {label("Next round")}
+          {separator}
+          {key("q")}
+          <Text> </Text>
+          {label("Quit")}
+        </Text>
+      ) : null}
+
+      {phase === "game_over" ? (
+        <Text>
+          {key("q")}
+          <Text> </Text>
+          {label("Quit")}
+        </Text>
+      ) : null}
     </Box>
   );
 }
