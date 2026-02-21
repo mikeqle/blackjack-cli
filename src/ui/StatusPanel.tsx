@@ -14,7 +14,7 @@ export function StatusPanel({ snapshot }: StatusPanelProps) {
 
   return (
     <Box borderStyle="round" borderColor="blueBright" paddingX={1}>
-      <Box>
+      <Box marginBottom={1}>
         <Text color="cyanBright" bold>
           TABLE STATUS
         </Text>
