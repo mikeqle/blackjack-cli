@@ -6,11 +6,20 @@ import { PANEL_PADDING_X } from "./layout";
 interface FooterHelpProps {
   phase: Phase;
   canDouble: boolean;
+  doubleHelp: string;
   canSplit: boolean;
+  splitHelp: string;
   compact?: boolean;
 }
 
-export function FooterHelp({ phase, canDouble, canSplit, compact = false }: FooterHelpProps) {
+export function FooterHelp({
+  phase,
+  canDouble,
+  doubleHelp,
+  canSplit,
+  splitHelp,
+  compact = false
+}: FooterHelpProps) {
   const key = (value: string) => (
     <Text color="white" bold>
       {value}
@@ -68,9 +77,9 @@ export function FooterHelp({ phase, canDouble, canSplit, compact = false }: Foot
               {key("q")} <Text>{label("Quit")}</Text>
             </Text>
             <Text>
-              {key("d")} <Text>{label(`Double${canDouble ? "" : " (N/A)"}`)}</Text>
+              {key("d")} <Text>{label(canDouble ? "Double" : `Double (${doubleHelp})`)}</Text>
               {separator}
-              {key("p")} <Text>{label(`Split${canSplit ? "" : " (N/A)"}`)}</Text>
+              {key("p")} <Text>{label(canSplit ? "Split" : `Split (${splitHelp})`)}</Text>
             </Text>
           </>
         );
@@ -83,10 +92,10 @@ export function FooterHelp({ phase, canDouble, canSplit, compact = false }: Foot
             {separator}
             {key("s")} <Text>{label("Stand")}</Text>
             {separator}
-            {key("d")} <Text>{label(`Double${canDouble ? "" : " (N/A)"}`)}</Text>
+            {key("d")} <Text>{label(canDouble ? "Double" : `Double (${doubleHelp})`)}</Text>
           </Text>
           <Text>
-            {key("p")} <Text>{label(`Split${canSplit ? "" : " (N/A)"}`)}</Text>
+            {key("p")} <Text>{label(canSplit ? "Split" : `Split (${splitHelp})`)}</Text>
             {separator}
             {key("q")} <Text>{label("Quit")}</Text>
           </Text>

@@ -107,7 +107,7 @@ export class BlackjackGame {
       this.advanceHand();
       this.message = `Hand ${this.activeHandIndex + 1} busted.`;
     } else {
-      this.message = "Hit or stand.";
+      this.message = "Hit, stand, double, or split.";
     }
   }
 
@@ -118,13 +118,18 @@ export class BlackjackGame {
   }
 
   doubleDown(): void {
-    if (!this.canDoubleDown()) return;
+    const reason = this.getDoubleDownUnavailableReason();
+    if (reason) {
+      this.message = `Cannot double down: ${reason}`;
+      return;
+    }
+
     const hand = this.playerHands[this.activeHandIndex];
     this.bankroll -= hand.bet;
     hand.bet *= 2;
     hand.doubled = true;
     hand.cards.push(this.shoe.draw());
-    this.message = `Hand ${this.activeHandIndex + 1} doubled down.`;
+    this.message = `Hand ${this.activeHandIndex + 1} doubled down and stands.`;
 
     if (isBust(hand.cards)) {
       hand.outcome = "lose";
@@ -135,7 +140,12 @@ export class BlackjackGame {
   }
 
   split(): void {
-    if (!this.canSplit()) return;
+    const reason = this.getSplitUnavailableReason();
+    if (reason) {
+      this.message = `Cannot split: ${reason}`;
+      return;
+    }
+
     const hand = this.playerHands[this.activeHandIndex];
     this.bankroll -= hand.bet;
 
@@ -198,15 +208,19 @@ export class BlackjackGame {
   }
 
   canDoubleDown(): boolean {
-    if (this.phase !== "player_turn") return false;
-    const hand = this.playerHands[this.activeHandIndex];
-    return hand.cards.length === 2 && !hand.doubled && this.bankroll >= hand.bet;
+    return this.getDoubleDownUnavailableReason() === null;
   }
 
   canSplit(): boolean {
-    if (this.phase !== "player_turn") return false;
-    const hand = this.playerHands[this.activeHandIndex];
-    return canSplit(hand.cards) && this.bankroll >= hand.bet;
+    return this.getSplitUnavailableReason() === null;
+  }
+
+  getDoubleDownHelpText(): string {
+    return this.getDoubleDownUnavailableReason() ?? "Double your bet, draw 1 card, and stand.";
+  }
+
+  getSplitHelpText(): string {
+    return this.getSplitUnavailableReason() ?? "Split equal-value cards into two hands.";
   }
 
   shouldRevealDealer(): boolean {
@@ -294,5 +308,25 @@ export class BlackjackGame {
     } else {
       this.message = "Round over: dealer wins.";
     }
+  }
+
+  private getDoubleDownUnavailableReason(): string | null {
+    if (this.phase !== "player_turn") return "Only available during your turn.";
+    const hand = this.playerHands[this.activeHandIndex];
+    if (!hand) return "No active hand.";
+    if (hand.cards.length !== 2) return "Allowed only on the first decision (2 cards).";
+    if (hand.doubled) return "This hand already doubled.";
+    if (this.bankroll < hand.bet) return `Need $${hand.bet} available to match the bet.`;
+    return null;
+  }
+
+  private getSplitUnavailableReason(): string | null {
+    if (this.phase !== "player_turn") return "Only available during your turn.";
+    const hand = this.playerHands[this.activeHandIndex];
+    if (!hand) return "No active hand.";
+    if (hand.cards.length !== 2) return "Only available with exactly 2 cards.";
+    if (!canSplit(hand.cards)) return "Cards must be equal in value.";
+    if (this.bankroll < hand.bet) return `Need $${hand.bet} available to match the bet.`;
+    return null;
   }
 }

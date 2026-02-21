@@ -116,7 +116,9 @@ export function GameApp() {
         <FooterHelp
           phase={snapshot.phase}
           canDouble={game.canDoubleDown()}
+          doubleHelp={game.getDoubleDownHelpText()}
           canSplit={game.canSplit()}
+          splitHelp={game.getSplitHelpText()}
           compact={layout.compact}
         />
       </Box>
