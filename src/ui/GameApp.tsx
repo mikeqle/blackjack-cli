@@ -50,7 +50,7 @@ export function GameApp() {
     }
 
     if (snapshot.phase === "round_over") {
-      if (key.return || key.space) game.nextRoundSameBet();
+      if (key.return || key.space || input === " ") game.nextRoundSameBet();
       if (input === "c") game.nextRound();
       refresh();
     }
