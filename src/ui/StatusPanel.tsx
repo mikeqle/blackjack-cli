@@ -1,4 +1,4 @@
-import { Box, Text } from "ink";
+import { Box, Newline, Text } from "ink";
 import React from "react";
 import type { RoundSnapshot } from "../engine/game";
 import { scoreHand } from "../engine/hand";
@@ -14,9 +14,10 @@ export function StatusPanel({ snapshot }: StatusPanelProps) {
 
   return (
     <Box borderStyle="round" borderColor="blueBright" paddingX={1}>
-      <Box marginBottom={1}>
+      <Box>
         <Text color="cyanBright" bold>
           TABLE STATUS
+          <Newline />
         </Text>
       </Box>
       <Text>
