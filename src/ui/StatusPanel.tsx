@@ -10,10 +10,11 @@ interface StatusPanelProps {
 export function StatusPanel({ snapshot }: StatusPanelProps) {
   const active = snapshot.playerHands[snapshot.activeHandIndex];
   const activeTotal = active ? scoreHand(active.cards).total : "N/A";
+  const separator = <Text color="gray"> | </Text>;
 
   return (
-    <Box borderStyle="round" borderColor="blueBright" paddingX={2} paddingY={1}>
-      <Box marginBottom={1}>
+    <Box borderStyle="round" borderColor="blueBright" paddingX={1}>
+      <Box>
         <Text color="cyanBright" bold>
           TABLE STATUS
         </Text>
@@ -22,19 +23,20 @@ export function StatusPanel({ snapshot }: StatusPanelProps) {
         <Text color="white" bold>
           Bankroll:
         </Text>{" "}
-        <Text color="greenBright">${snapshot.bankroll.toFixed(2)}</Text>{" "}
+        <Text color="greenBright">${snapshot.bankroll.toFixed(2)}</Text>
+        {separator}
         <Text color="white" bold>
-          | Current Bet:
+          Bet:
         </Text>{" "}
         <Text color="yellowBright">${snapshot.pendingBet}</Text>
-      </Text>
-      <Text>
+        {separator}
         <Text color="white" bold>
           Active Total:
         </Text>{" "}
-        <Text color="cyan">{activeTotal}</Text>{" "}
+        <Text color="cyan">{activeTotal}</Text>
+        {separator}
         <Text color="white" bold>
-          | Shoe:
+          Shoe:
         </Text>{" "}
         <Text color="white">{snapshot.shoeRemaining} cards</Text>
       </Text>

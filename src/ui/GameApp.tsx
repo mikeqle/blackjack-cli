@@ -56,18 +56,18 @@ export function GameApp() {
   const revealDealer = game.shouldRevealDealer();
 
   return (
-    <Box flexDirection="column" paddingX={2} paddingY={1}>
-      <Box marginBottom={1}>
+    <Box flexDirection="column" paddingX={1}>
+      <Box>
         <Text color="magentaBright" bold>
           CLI BLACKJACK
         </Text>
       </Box>
 
-      <Box marginBottom={1}>
+      <Box>
         <StatusPanel snapshot={snapshot} />
       </Box>
 
-      <Box flexDirection="column" marginBottom={1}>
+      <Box flexDirection="column">
         <HandView
           title="Dealer"
           cards={snapshot.dealerCards}
@@ -75,7 +75,7 @@ export function GameApp() {
         />
       </Box>
 
-      <Box flexDirection="column" marginBottom={1}>
+      <Box flexDirection="column">
         {snapshot.playerHands.map((hand, idx) => (
           <HandView
             key={`hand-${idx}`}
@@ -87,7 +87,7 @@ export function GameApp() {
         ))}
       </Box>
 
-      <Box marginBottom={1}>
+      <Box>
         <Text>
           <Text color="cyanBright" bold>
             STATUS
@@ -97,7 +97,7 @@ export function GameApp() {
       </Box>
 
       {snapshot.phase === "round_over" ? (
-        <Box marginBottom={1}>
+        <Box>
           <Text color="yellowBright">
             <Text bold>NEXT ROUND</Text>  Press <Text color="white" bold>n</Text> to continue.
           </Text>
@@ -105,14 +105,14 @@ export function GameApp() {
       ) : null}
 
       {snapshot.phase === "game_over" ? (
-        <Box marginBottom={1}>
+        <Box>
           <Text color="redBright">
             <Text bold>GAME OVER</Text>  Out of bankroll. Press <Text color="white" bold>q</Text> to quit.
           </Text>
         </Box>
       ) : null}
 
-      <Box marginTop={1} marginBottom={1}>
+      <Box>
         <FooterHelp phase={snapshot.phase} canDouble={game.canDoubleDown()} canSplit={game.canSplit()} />
       </Box>
     </Box>

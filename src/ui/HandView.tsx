@@ -20,16 +20,14 @@ export function HandView({ title, cards, hiddenIndex, active = false, outcome }:
   return (
     <Box
       flexDirection="column"
-      marginBottom={1}
       borderStyle="round"
       borderColor={active ? "yellowBright" : "cyan"}
-      paddingX={2}
-      paddingY={1}
+      paddingX={1}
     >
       <Text color={active ? "yellowBright" : "cyanBright"} bold>
         {title}
       </Text>
-      <Box marginTop={1} marginBottom={1}>
+      <Box>
         {cards.map((card, idx) => (
           <CardView key={`${card.rank}-${card.suit}-${idx}`} card={card} hidden={idx === hiddenIndex} />
         ))}

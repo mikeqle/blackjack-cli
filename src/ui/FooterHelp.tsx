@@ -17,85 +17,89 @@ export function FooterHelp({ phase, canDouble, canSplit }: FooterHelpProps) {
 
   const label = (value: string) => <Text color="cyanBright">{value}</Text>;
 
-  const separator = <Text color="gray">  |  </Text>;
+  const separator = <Text color="gray"> | </Text>;
+
+  const renderBody = () => {
+    if (phase === "betting") {
+      return (
+        <>
+          <Text>
+            {key("←/→")} <Text>{label("Bet -/+10")}</Text>
+            {separator}
+            {key("↓/↑")} <Text>{label("Bet -/+50")}</Text>
+            {separator}
+            {key("Enter/Space")} <Text>{label("Deal")}</Text>
+          </Text>
+          <Text>
+            {key("q")} <Text>{label("Quit")}</Text>
+          </Text>
+        </>
+      );
+    }
+
+    if (phase === "player_turn") {
+      return (
+        <>
+          <Text>
+            {key("h")} <Text>{label("Hit")}</Text>
+            {separator}
+            {key("s")} <Text>{label("Stand")}</Text>
+            {separator}
+            {key("d")} <Text>{label(`Double${canDouble ? "" : " (N/A)"}`)}</Text>
+          </Text>
+          <Text>
+            {key("p")} <Text>{label(`Split${canSplit ? "" : " (N/A)"}`)}</Text>
+            {separator}
+            {key("q")} <Text>{label("Quit")}</Text>
+          </Text>
+        </>
+      );
+    }
+
+    if (phase === "dealer_turn") {
+      return (
+        <>
+          <Text color="yellowBright">
+            <Text bold>WAIT</Text> Dealer playing...
+          </Text>
+          <Text>
+            {key("q")} <Text>{label("Quit")}</Text>
+          </Text>
+        </>
+      );
+    }
+
+    if (phase === "round_over") {
+      return (
+        <>
+          <Text>
+            {key("n")} <Text>{label("Next round")}</Text>
+            {separator}
+            {key("q")} <Text>{label("Quit")}</Text>
+          </Text>
+          <Text> </Text>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Text>
+          {key("q")} <Text>{label("Quit")}</Text>
+        </Text>
+        <Text> </Text>
+      </>
+    );
+  };
 
   return (
-    <Box flexDirection="column" borderStyle="round" borderColor="cyan" paddingX={2} paddingY={1}>
-      <Box marginBottom={1}>
+    <Box flexDirection="column" borderStyle="round" borderColor="cyan" paddingX={1} minHeight={5}>
+      <Box>
         <Text color="cyanBright" bold>
           CONTROLS
         </Text>
       </Box>
-
-      {phase === "betting" ? (
-        <Text>
-          {key("←/→")}
-          <Text> </Text>
-          {label("Bet -/+10")}
-          {separator}
-          {key("↓/↑")}
-          <Text> </Text>
-          {label("Bet -/+50")}
-          {separator}
-          {key("Enter/Space")}
-          <Text> </Text>
-          {label("Deal")}
-          {separator}
-          {key("q")}
-          <Text> </Text>
-          {label("Quit")}
-        </Text>
-      ) : null}
-
-      {phase === "player_turn" ? (
-        <Text>
-          {key("h")}
-          <Text> </Text>
-          {label("Hit")}
-          {separator}
-          {key("s")}
-          <Text> </Text>
-          {label("Stand")}
-          {separator}
-          {key("d")}
-          <Text> </Text>
-          {label(`Double${canDouble ? "" : " (N/A)"}`)}
-          {separator}
-          {key("p")}
-          <Text> </Text>
-          {label(`Split${canSplit ? "" : " (N/A)"}`)}
-          {separator}
-          {key("q")}
-          <Text> </Text>
-          {label("Quit")}
-        </Text>
-      ) : null}
-
-      {phase === "dealer_turn" ? (
-        <Text color="yellowBright">
-          <Text bold>WAIT</Text>  Dealer playing...
-        </Text>
-      ) : null}
-
-      {phase === "round_over" ? (
-        <Text>
-          {key("n")}
-          <Text> </Text>
-          {label("Next round")}
-          {separator}
-          {key("q")}
-          <Text> </Text>
-          {label("Quit")}
-        </Text>
-      ) : null}
-
-      {phase === "game_over" ? (
-        <Text>
-          {key("q")}
-          <Text> </Text>
-          {label("Quit")}
-        </Text>
-      ) : null}
+      {renderBody()}
     </Box>
   );
 }
