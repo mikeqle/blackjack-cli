@@ -2,19 +2,21 @@ import { Box, Newline, Text } from "ink";
 import React from "react";
 import type { RoundSnapshot } from "../engine/game";
 import { scoreHand } from "../engine/hand";
+import { PANEL_PADDING_X } from "./layout";
 
 interface StatusPanelProps {
   snapshot: RoundSnapshot;
+  compact?: boolean;
 }
 
-export function StatusPanel({ snapshot }: StatusPanelProps) {
+export function StatusPanel({ snapshot, compact = false }: StatusPanelProps) {
   const active = snapshot.playerHands[snapshot.activeHandIndex];
   const activeTotal = active ? scoreHand(active.cards).total : "N/A";
   const separator = <Text color="gray"> | </Text>;
 
   return (
-    <Box borderStyle="round" borderColor="blueBright" paddingX={1}>
-      <Box>
+    <Box flexDirection="column" borderStyle="round" borderColor="blueBright" paddingX={PANEL_PADDING_X} width="100%">
+      <Box width="100%">
         <Text color="cyanBright" bold>
           TABLE STATUS
           <Newline />
@@ -30,7 +32,8 @@ export function StatusPanel({ snapshot }: StatusPanelProps) {
           Bet:
         </Text>{" "}
         <Text color="yellowBright">${snapshot.pendingBet}</Text>
-        {separator}
+        {!compact ? separator : null}
+        {compact ? <Newline /> : null}
         <Text color="white" bold>
           Active Total:
         </Text>{" "}

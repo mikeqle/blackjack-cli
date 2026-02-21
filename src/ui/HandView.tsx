@@ -3,6 +3,7 @@ import React from "react";
 import type { Card } from "../engine/cards";
 import { scoreHand } from "../engine/hand";
 import { CardView } from "./CardView";
+import { PANEL_PADDING_X } from "./layout";
 
 interface HandViewProps {
   title: string;
@@ -10,10 +11,11 @@ interface HandViewProps {
   hiddenIndex?: number;
   active?: boolean;
   outcome?: string;
+  width?: number | string;
   key?: string;
 }
 
-export function HandView({ title, cards, hiddenIndex, active = false, outcome }: HandViewProps) {
+export function HandView({ title, cards, hiddenIndex, active = false, outcome, width = "100%" }: HandViewProps) {
   const visibleCards = cards.filter((_, idx) => idx !== hiddenIndex);
   const score = scoreHand(visibleCards);
 
@@ -22,7 +24,8 @@ export function HandView({ title, cards, hiddenIndex, active = false, outcome }:
       flexDirection="column"
       borderStyle="round"
       borderColor={active ? "yellowBright" : "cyan"}
-      paddingX={1}
+      paddingX={PANEL_PADDING_X}
+      width={width}
     >
       <Text color={active ? "yellowBright" : "cyanBright"} bold>
         {title}

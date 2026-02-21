@@ -3,12 +3,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { BlackjackGame } from "../engine/game";
 import { FooterHelp } from "./FooterHelp";
 import { HandView } from "./HandView";
+import { APP_OUTER_PADDING_X, getAppLayout } from "./layout";
 import { StatusPanel } from "./StatusPanel";
 
 export function GameApp() {
   const { exit } = useApp();
   const game = useMemo(() => new BlackjackGame({ bankroll: 500, minBet: 10, decks: 2 }), []);
   const [snapshot, setSnapshot] = useState(game.snapshot());
+  const layout = getAppLayout(process.stdout.columns ?? 80);
 
   const refresh = () => setSnapshot(game.snapshot());
 
@@ -56,64 +58,67 @@ export function GameApp() {
   const revealDealer = game.shouldRevealDealer();
 
   return (
-    <Box flexDirection="column" paddingX={1}>
-      <Box>
-        <Text color="magentaBright" bold>
-          CLI BLACKJACK
-        </Text>
-      </Box>
+    <Box flexDirection="column" paddingX={APP_OUTER_PADDING_X}>
+      <Box flexDirection="column" width={layout.width}>
+        <Box width="100%">
+          <Text color="magentaBright" bold>
+            CLI BLACKJACK
+          </Text>
+        </Box>
 
-      <Box>
-        <StatusPanel snapshot={snapshot} />
-      </Box>
+        <StatusPanel snapshot={snapshot} compact={layout.compact} />
 
-      <Box flexDirection="column">
-        <HandView
-          title="Dealer"
-          cards={snapshot.dealerCards}
-          hiddenIndex={revealDealer ? undefined : 1}
-        />
-      </Box>
-
-      <Box flexDirection="column">
-        {snapshot.playerHands.map((hand, idx) => (
+        <Box flexDirection="column" width="100%">
           <HandView
-            key={`hand-${idx}`}
-            title={`Player Hand ${idx + 1} (${hand.bet})`}
-            cards={hand.cards}
-            active={snapshot.phase === "player_turn" && snapshot.activeHandIndex === idx}
-            outcome={snapshot.phase === "round_over" || snapshot.phase === "game_over" ? hand.outcome : undefined}
+            title="Dealer"
+            cards={snapshot.dealerCards}
+            hiddenIndex={revealDealer ? undefined : 1}
           />
-        ))}
-      </Box>
+        </Box>
 
-      <Box>
-        <Text>
-          <Text color="cyanBright" bold>
-            STATUS
-          </Text>
-          <Text color="white">  {snapshot.message}</Text>
-        </Text>
-      </Box>
+        <Box flexDirection="column" width="100%">
+          {snapshot.playerHands.map((hand, idx) => (
+            <HandView
+              key={`hand-${idx}`}
+              title={`Player Hand ${idx + 1} (${hand.bet})`}
+              cards={hand.cards}
+              active={snapshot.phase === "player_turn" && snapshot.activeHandIndex === idx}
+              outcome={snapshot.phase === "round_over" || snapshot.phase === "game_over" ? hand.outcome : undefined}
+            />
+          ))}
+        </Box>
 
-      {snapshot.phase === "round_over" ? (
-        <Box>
-          <Text color="yellowBright">
-            <Text bold>NEXT ROUND</Text>  Press <Text color="white" bold>n</Text> to continue.
+        <Box width="100%">
+          <Text>
+            <Text color="cyanBright" bold>
+              STATUS
+            </Text>
+            <Text color="white">  {snapshot.message}</Text>
           </Text>
         </Box>
-      ) : null}
 
-      {snapshot.phase === "game_over" ? (
-        <Box>
-          <Text color="redBright">
-            <Text bold>GAME OVER</Text>  Out of bankroll. Press <Text color="white" bold>q</Text> to quit.
-          </Text>
-        </Box>
-      ) : null}
+        {snapshot.phase === "round_over" ? (
+          <Box width="100%">
+            <Text color="yellowBright">
+              <Text bold>NEXT ROUND</Text>  Press <Text color="white" bold>n</Text> to continue.
+            </Text>
+          </Box>
+        ) : null}
 
-      <Box>
-        <FooterHelp phase={snapshot.phase} canDouble={game.canDoubleDown()} canSplit={game.canSplit()} />
+        {snapshot.phase === "game_over" ? (
+          <Box width="100%">
+            <Text color="redBright">
+              <Text bold>GAME OVER</Text>  Out of bankroll. Press <Text color="white" bold>q</Text> to quit.
+            </Text>
+          </Box>
+        ) : null}
+
+        <FooterHelp
+          phase={snapshot.phase}
+          canDouble={game.canDoubleDown()}
+          canSplit={game.canSplit()}
+          compact={layout.compact}
+        />
       </Box>
     </Box>
   );
