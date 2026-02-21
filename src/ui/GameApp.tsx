@@ -35,7 +35,7 @@ export function GameApp() {
       if (key.rightArrow) game.adjustBet(10);
       if (key.downArrow) game.adjustBet(-50);
       if (key.upArrow) game.adjustBet(50);
-      if (key.return || key.space) game.startRound();
+      if (key.return || key.space || input === " ") game.startRound();
       refresh();
       return;
     }
