@@ -120,11 +120,13 @@ export function FooterHelp({
       return (
         <>
           <Text>
-            {key("n")} <Text>{label("Next round")}</Text>
+            {key("Enter/Space")} <Text>{label("Bet same amount")}</Text>
             {separator}
+            {key("c")} <Text>{label("Change bet")}</Text>
+          </Text>
+          <Text>
             {key("q")} <Text>{label("Quit")}</Text>
           </Text>
-          <Text> </Text>
         </>
       );
     }

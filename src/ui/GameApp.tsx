@@ -49,8 +49,9 @@ export function GameApp() {
       return;
     }
 
-    if (snapshot.phase === "round_over" && input === "n") {
-      game.nextRound();
+    if (snapshot.phase === "round_over") {
+      if (key.return || key.space) game.nextRoundSameBet();
+      if (input === "c") game.nextRound();
       refresh();
     }
   });
@@ -100,7 +101,7 @@ export function GameApp() {
         {snapshot.phase === "round_over" ? (
           <Box width="100%">
             <Text color="yellowBright">
-              <Text bold>NEXT ROUND</Text>  Press <Text color="white" bold>n</Text> to continue.
+              <Text bold>NEXT ROUND</Text>  <Text color="white" bold>Enter/Space</Text> same bet, <Text color="white" bold>c</Text> change bet.
             </Text>
           </Box>
         ) : null}

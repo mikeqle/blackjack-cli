@@ -182,21 +182,27 @@ export class BlackjackGame {
   }
 
   nextRound(): void {
-    if (this.phase !== "round_over") return;
-    this.dealerCards = [];
-    this.playerHands = [];
-    this.activeHandIndex = 0;
-    if (this.bankroll < this.minBet) {
-      this.phase = "game_over";
-      this.message = "Out of bankroll. Press q to quit.";
-      return;
-    }
+    if (!this.prepareNextRound()) return;
 
     this.phase = "betting";
     if (this.pendingBet > this.bankroll) {
       this.pendingBet = Math.max(this.minBet, Math.floor(this.bankroll / this.minBet) * this.minBet);
     }
     this.message = "Set your bet to begin.";
+  }
+
+  nextRoundSameBet(): void {
+    if (!this.prepareNextRound()) return;
+
+    if (this.pendingBet > this.bankroll) {
+      this.phase = "betting";
+      this.pendingBet = Math.max(this.minBet, Math.floor(this.bankroll / this.minBet) * this.minBet);
+      this.message = "Cannot repeat previous bet. Adjust your bet and deal.";
+      return;
+    }
+
+    this.phase = "betting";
+    this.startRound();
   }
 
   canHit(): boolean {
@@ -249,6 +255,21 @@ export class BlackjackGame {
 
     this.phase = "dealer_turn";
     this.message = "Dealer turn...";
+  }
+
+  private prepareNextRound(): boolean {
+    if (this.phase !== "round_over") return false;
+    this.dealerCards = [];
+    this.playerHands = [];
+    this.activeHandIndex = 0;
+
+    if (this.bankroll < this.minBet) {
+      this.phase = "game_over";
+      this.message = "Out of bankroll. Press q to quit.";
+      return false;
+    }
+
+    return true;
   }
 
   private settleRound(): void {
