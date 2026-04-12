@@ -24,6 +24,13 @@ export interface RoundSnapshot {
   shoeRemaining: number;
 }
 
+export interface BlackjackGameConfig {
+  bankroll?: number;
+  minBet?: number;
+  decks?: number;
+  initialMessage?: string;
+}
+
 export class BlackjackGame {
   readonly minBet: number;
   private readonly shoe: Shoe;
@@ -35,11 +42,17 @@ export class BlackjackGame {
   private activeHandIndex = 0;
   private message = "Set your bet to begin.";
 
-  constructor(config?: { bankroll?: number; minBet?: number; decks?: number }) {
+  constructor(config?: BlackjackGameConfig) {
     this.minBet = config?.minBet ?? 10;
     this.bankroll = config?.bankroll ?? 500;
     this.pendingBet = this.minBet;
     this.shoe = new Shoe(config?.decks ?? 1);
+    this.message = config?.initialMessage ?? "Set your bet to begin.";
+
+    if (this.bankroll < this.minBet) {
+      this.phase = "game_over";
+      this.message = "Balance below minimum bet. Come back tomorrow for your daily +$1000.";
+    }
   }
 
   snapshot(): RoundSnapshot {

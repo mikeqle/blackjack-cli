@@ -6,10 +6,13 @@ import { PANEL_PADDING_X } from "./layout";
 
 interface StatusPanelProps {
   snapshot: RoundSnapshot;
+  runMaxBalance: number;
+  highScore: number;
+  nextDailyCreditDate: string;
   compact?: boolean;
 }
 
-export function StatusPanel({ snapshot, compact = false }: StatusPanelProps) {
+export function StatusPanel({ snapshot, runMaxBalance, highScore, nextDailyCreditDate, compact = false }: StatusPanelProps) {
   const active = snapshot.playerHands[snapshot.activeHandIndex];
   const activeTotal = active ? scoreHand(active.cards).total : "N/A";
   const separator = <Text color="gray"> | </Text>;
@@ -44,6 +47,26 @@ export function StatusPanel({ snapshot, compact = false }: StatusPanelProps) {
         </Text>{" "}
         <Text color="white">{snapshot.shoeRemaining} cards</Text>
       </Text>
+      <Text>
+        <Text color="white" bold>
+          Run Max:
+        </Text>{" "}
+        <Text color="greenBright">${runMaxBalance.toFixed(2)}</Text>
+        {separator}
+        <Text color="white" bold>
+          High Score:
+        </Text>{" "}
+        <Text color="greenBright">${highScore.toFixed(2)}</Text>
+      </Text>
+      {snapshot.phase === "game_over" ? (
+        <Text>
+          <Text color="white" bold>
+            Next Daily Credit:
+          </Text>{" "}
+          <Text color="yellowBright">{nextDailyCreditDate}</Text>
+          <Text color="gray"> (local)</Text>
+        </Text>
+      ) : null}
     </Box>
   );
 }

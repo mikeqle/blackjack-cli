@@ -143,3 +143,13 @@ describe("BlackjackGame double down", () => {
     expect(snapshot.phase).toBe("dealer_turn");
   });
 });
+
+describe("BlackjackGame bankroll gating", () => {
+  test("starts in game over when bankroll is below minimum bet", () => {
+    const game = new BlackjackGame({ bankroll: 5, minBet: 10, decks: 1 });
+    const snapshot = game.snapshot();
+
+    expect(snapshot.phase).toBe("game_over");
+    expect(snapshot.message).toContain("Come back tomorrow");
+  });
+});

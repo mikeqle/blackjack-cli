@@ -4,6 +4,7 @@ declare module "react" {
   export function useEffect(effect: () => void | (() => void), deps?: unknown[]): void;
   export function useMemo<T>(factory: () => T, deps: unknown[]): T;
   export function useState<T>(value: T): [T, (value: T) => void];
+  export function useRef<T>(value: T): { current: T };
   const React: any;
   export default React;
 }

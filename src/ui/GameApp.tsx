@@ -1,18 +1,88 @@
 import { Box, Text, useApp, useInput } from "ink";
-import React, { useEffect, useMemo, useState } from "react";
-import { BlackjackGame } from "../engine/game";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { BlackjackGame, type Phase } from "../engine/game";
+import { BankrollStore } from "../persistence/bankrollStore";
 import { FooterHelp } from "./FooterHelp";
 import { HandView } from "./HandView";
 import { APP_OUTER_PADDING_X, getAppLayout } from "./layout";
 import { StatusPanel } from "./StatusPanel";
 
+const MIN_BET = 10;
+const DECKS = 2;
+
+function isHandEndPhase(phase: Phase): boolean {
+  return phase === "round_over" || phase === "game_over";
+}
+
+function getNextDailyCreditDateLabel(date = new Date()): string {
+  const next = new Date(date);
+  next.setDate(next.getDate() + 1);
+  const year = next.getFullYear();
+  const month = `${next.getMonth() + 1}`.padStart(2, "0");
+  const day = `${next.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function GameApp() {
   const { exit } = useApp();
-  const game = useMemo(() => new BlackjackGame({ bankroll: 500, minBet: 10, decks: 2 }), []);
+  const session = useMemo(() => {
+    const store = new BankrollStore();
+    const state = store.bootstrapSession();
+    const initialMessage = state.dailyCreditApplied
+      ? `Daily credit received: +$${state.dailyCreditAmount}. Set your bet to begin.`
+      : undefined;
+
+    const game = new BlackjackGame({
+      bankroll: state.balance,
+      minBet: MIN_BET,
+      decks: DECKS,
+      initialMessage
+    });
+
+    return {
+      game,
+      store,
+      initialRunMax: state.balance,
+      initialHighScore: state.highScore
+    };
+  }, []);
+  const { game, store, initialRunMax, initialHighScore } = session;
   const [snapshot, setSnapshot] = useState(game.snapshot());
+  const [runMaxBalance, setRunMaxBalance] = useState(initialRunMax);
+  const [highScore, setHighScore] = useState(initialHighScore);
+  const nextDailyCreditDate = useMemo(() => getNextDailyCreditDateLabel(), []);
   const layout = getAppLayout(process.stdout.columns ?? 80);
+  const runMaxRef = useRef(initialRunMax);
+  const highScoreRef = useRef(initialHighScore);
+  const previousPhaseRef = useRef(snapshot.phase);
 
   const refresh = () => setSnapshot(game.snapshot());
+
+  useEffect(
+    () => () => {
+      store.close();
+    },
+    [store]
+  );
+
+  useEffect(() => {
+    store.persistBalance(snapshot.bankroll);
+
+    const nextRunMax = Math.max(runMaxRef.current, snapshot.bankroll);
+    if (nextRunMax !== runMaxRef.current) {
+      runMaxRef.current = nextRunMax;
+      setRunMaxBalance(nextRunMax);
+    }
+
+    const enteredHandEnd = isHandEndPhase(snapshot.phase) && !isHandEndPhase(previousPhaseRef.current);
+    if (enteredHandEnd && nextRunMax > highScoreRef.current) {
+      store.persistHighScore(nextRunMax);
+      highScoreRef.current = nextRunMax;
+      setHighScore(nextRunMax);
+    }
+
+    previousPhaseRef.current = snapshot.phase;
+  }, [snapshot.bankroll, snapshot.phase, store]);
 
   useEffect(() => {
     if (snapshot.phase !== "dealer_turn") return;
@@ -67,7 +137,13 @@ export function GameApp() {
           </Text>
         </Box>
 
-        <StatusPanel snapshot={snapshot} compact={layout.compact} />
+        <StatusPanel
+          snapshot={snapshot}
+          runMaxBalance={runMaxBalance}
+          highScore={highScore}
+          nextDailyCreditDate={nextDailyCreditDate}
+          compact={layout.compact}
+        />
 
         <Box flexDirection="column" width="100%">
           <HandView

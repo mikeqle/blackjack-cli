@@ -35,7 +35,8 @@ bun run game
 
 ### Round over
 
-- `n`: Next round
+- `Enter` or `Space`: Next round (same bet)
+- `c`: Next round (change bet)
 - `q`: Quit
 
 ## Rules implemented
@@ -46,3 +47,10 @@ bun run game
 - Split and double-down support (when bankroll/rules allow)
 - Natural blackjack pays 3:2
 - Bankroll and bet tracking per hand
+
+## Persistent progression
+
+- Bankroll is persisted in a local SQLite database at `~/.blackjack-cli/blackjack.db`
+- On app open, if it is a new local calendar day, `+$1000` is added to your current balance
+- If balance drops below minimum bet, the run is over until a new day credit is applied
+- Tracks max balance reached in the current run and updates all-time high score at hand end
