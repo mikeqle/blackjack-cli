@@ -1,6 +1,8 @@
 import type { Card } from "./cards";
+import { HiLoCounter, type CountSnapshot } from "./counting";
 import { Shoe } from "./deck";
 import { canSplit, isBlackjack, isBust, scoreHand } from "./hand";
+import { bettingAdvice, recommend, type BetAdvice, type Recommendation } from "./strategy";
 
 export type Phase = "betting" | "player_turn" | "dealer_turn" | "round_over" | "game_over";
 
@@ -22,6 +24,9 @@ export interface RoundSnapshot {
   activeHandIndex: number;
   message: string;
   shoeRemaining: number;
+  count: CountSnapshot;
+  recommendation: Recommendation | null;
+  betAdvice: BetAdvice;
 }
 
 export interface BlackjackGameConfig {
@@ -31,9 +36,15 @@ export interface BlackjackGameConfig {
   initialMessage?: string;
 }
 
+function roundMoney(amount: number): number {
+  return Math.round(amount * 100) / 100;
+}
+
 export class BlackjackGame {
   readonly minBet: number;
+  readonly decks: number;
   private readonly shoe: Shoe;
+  private readonly counter: HiLoCounter;
   private phase: Phase = "betting";
   private bankroll: number;
   private pendingBet: number;
@@ -44,9 +55,15 @@ export class BlackjackGame {
 
   constructor(config?: BlackjackGameConfig) {
     this.minBet = config?.minBet ?? 10;
-    this.bankroll = config?.bankroll ?? 500;
+    this.decks = config?.decks ?? 1;
+    this.bankroll = roundMoney(config?.bankroll ?? 500);
     this.pendingBet = this.minBet;
-    this.shoe = new Shoe(config?.decks ?? 1);
+    this.shoe = new Shoe(this.decks);
+    this.counter = new HiLoCounter(this.shoe.totalCards());
+    this.shoe.setObserver({
+      onDraw: (card) => this.counter.observe(card),
+      onReshuffle: () => this.counter.reset()
+    });
     this.message = config?.initialMessage ?? "Set your bet to begin.";
 
     if (this.bankroll < this.minBet) {
@@ -56,6 +73,7 @@ export class BlackjackGame {
   }
 
   snapshot(): RoundSnapshot {
+    const count = this.counter.snapshot();
     return {
       phase: this.phase,
       bankroll: this.bankroll,
@@ -64,7 +82,10 @@ export class BlackjackGame {
       playerHands: this.playerHands,
       activeHandIndex: this.activeHandIndex,
       message: this.message,
-      shoeRemaining: this.shoe.remaining()
+      shoeRemaining: this.shoe.remaining(),
+      count,
+      recommendation: this.computeRecommendation(count.trueCount),
+      betAdvice: bettingAdvice(count.trueCount)
     };
   }
 
@@ -82,7 +103,7 @@ export class BlackjackGame {
       return false;
     }
 
-    this.bankroll -= this.pendingBet;
+    this.bankroll = roundMoney(this.bankroll - this.pendingBet);
     this.phase = "player_turn";
     this.dealerCards = [this.shoe.draw(), this.shoe.draw()];
     const cards = [this.shoe.draw(), this.shoe.draw()];
@@ -138,7 +159,7 @@ export class BlackjackGame {
     }
 
     const hand = this.playerHands[this.activeHandIndex];
-    this.bankroll -= hand.bet;
+    this.bankroll = roundMoney(this.bankroll - hand.bet);
     hand.bet *= 2;
     hand.doubled = true;
     hand.cards.push(this.shoe.draw());
@@ -160,7 +181,7 @@ export class BlackjackGame {
     }
 
     const hand = this.playerHands[this.activeHandIndex];
-    this.bankroll -= hand.bet;
+    this.bankroll = roundMoney(this.bankroll - hand.bet);
 
     const firstCard = hand.cards[0];
     const secondCard = hand.cards[1];
@@ -251,6 +272,15 @@ export class BlackjackGame {
     return scoreHand(this.playerHands[this.activeHandIndex].cards).total;
   }
 
+  private computeRecommendation(trueCount: number): Recommendation | null {
+    if (this.phase !== "player_turn") return null;
+    const hand = this.playerHands[this.activeHandIndex];
+    if (!hand) return null;
+    const dealerUp = this.dealerCards[0];
+    if (!dealerUp) return null;
+    return recommend(hand.cards, dealerUp, this.canSplit(), this.canDoubleDown(), trueCount);
+  }
+
   private advanceHand(): void {
     const next = this.playerHands.findIndex((_, i) => i > this.activeHandIndex && !this.playerHands[i].outcome);
 
@@ -300,10 +330,10 @@ export class BlackjackGame {
       if (hand.naturalBlackjack) {
         if (dealerNatural) {
           hand.outcome = "push";
-          this.bankroll += hand.bet;
+          this.bankroll = roundMoney(this.bankroll + hand.bet);
         } else {
           hand.outcome = "blackjack";
-          this.bankroll += hand.bet * 2.5;
+          this.bankroll = roundMoney(this.bankroll + hand.bet * 2.5);
         }
         continue;
       }
@@ -315,18 +345,18 @@ export class BlackjackGame {
 
       if (dealerBust) {
         hand.outcome = "win";
-        this.bankroll += hand.bet * 2;
+        this.bankroll = roundMoney(this.bankroll + hand.bet * 2);
         continue;
       }
 
       if (playerScore.total > dealerScore.total) {
         hand.outcome = "win";
-        this.bankroll += hand.bet * 2;
+        this.bankroll = roundMoney(this.bankroll + hand.bet * 2);
       } else if (playerScore.total < dealerScore.total) {
         hand.outcome = "lose";
       } else {
         hand.outcome = "push";
-        this.bankroll += hand.bet;
+        this.bankroll = roundMoney(this.bankroll + hand.bet);
       }
     }
 

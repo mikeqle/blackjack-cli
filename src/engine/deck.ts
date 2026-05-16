@@ -18,14 +18,24 @@ function createDeck(): Card[] {
   return deck;
 }
 
+export interface ShoeObserver {
+  onDraw?: (card: Card) => void;
+  onReshuffle?: () => void;
+}
+
 export class Shoe {
   private cards: Card[] = [];
+  private observer: ShoeObserver = {};
 
   constructor(
-    private readonly decks = 1,
+    readonly decks = 1,
     private readonly reshuffleThreshold = 15
   ) {
     this.reset();
+  }
+
+  setObserver(observer: ShoeObserver): void {
+    this.observer = observer;
   }
 
   reset(): void {
@@ -34,6 +44,7 @@ export class Shoe {
       fresh.push(...createDeck());
     }
     this.cards = shuffle(fresh);
+    this.observer.onReshuffle?.();
   }
 
   draw(): Card {
@@ -43,13 +54,17 @@ export class Shoe {
 
     const card = this.cards.pop();
     if (!card) {
-      this.reset();
-      return this.draw();
+      throw new Error("Shoe is empty after reset; deck configuration invalid.");
     }
+    this.observer.onDraw?.(card);
     return card;
   }
 
   remaining(): number {
     return this.cards.length;
+  }
+
+  totalCards(): number {
+    return this.decks * 52;
   }
 }

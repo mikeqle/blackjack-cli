@@ -2,6 +2,7 @@ import { Box, Text, useApp, useInput } from "ink";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BlackjackGame, type Phase } from "../engine/game";
 import { BankrollStore } from "../persistence/bankrollStore";
+import { CounterPanel } from "./CounterPanel";
 import { FooterHelp } from "./FooterHelp";
 import { HandView } from "./HandView";
 import { APP_OUTER_PADDING_X, getAppLayout } from "./layout";
@@ -50,6 +51,7 @@ export function GameApp() {
   const [snapshot, setSnapshot] = useState(game.snapshot());
   const [runMaxBalance, setRunMaxBalance] = useState(initialRunMax);
   const [highScore, setHighScore] = useState(initialHighScore);
+  const [counterEnabled, setCounterEnabled] = useState(false);
   const nextDailyCreditDate = useMemo(() => getNextDailyCreditDateLabel(), []);
   const layout = getAppLayout(process.stdout.columns ?? 80);
   const runMaxRef = useRef(initialRunMax);
@@ -100,6 +102,11 @@ export function GameApp() {
       return;
     }
 
+    if (input === "t") {
+      setCounterEnabled(!counterEnabled);
+      return;
+    }
+
     if (snapshot.phase === "betting") {
       if (key.leftArrow) game.adjustBet(-10);
       if (key.rightArrow) game.adjustBet(10);
@@ -144,6 +151,8 @@ export function GameApp() {
           nextDailyCreditDate={nextDailyCreditDate}
           compact={layout.compact}
         />
+
+        <CounterPanel snapshot={snapshot} enabled={counterEnabled} />
 
         <Box flexDirection="column" width="100%">
           <HandView

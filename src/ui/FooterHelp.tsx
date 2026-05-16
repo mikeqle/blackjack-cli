@@ -141,6 +141,12 @@ export function FooterHelp({
     );
   };
 
+  const counterHint = (
+    <Text>
+      {key("t")} <Text>{label("Toggle counter helper")}</Text>
+    </Text>
+  );
+
   return (
     <Box
       flexDirection="column"
@@ -156,6 +162,7 @@ export function FooterHelp({
         </Text>
       </Box>
       {renderBody()}
+      {counterHint}
     </Box>
   );
 }

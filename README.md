@@ -39,6 +39,22 @@ bun run game
 - `c`: Next round (change bet)
 - `q`: Quit
 
+### Anytime
+
+- `t`: Toggle the Mr. Rosa card-counter helper
+
+## Card-counter helper (movie *21* mode)
+
+Press `t` to enlist with the MIT team. While enabled, the COUNTER panel shows:
+
+- **RC** — Hi-Lo running count (low cards +1, neutral 0, tens/aces -1)
+- **TC** — true count (running count divided by decks remaining)
+- **Decks left** and cards seen so far in the shoe
+- **Bet signal** during betting / round-over — suggested unit size and a one-line vibe ("Hot shoe. Big player up.")
+- **Play** during your turn — basic strategy decision with the Illustrious-18 deviations applied when the count justifies it (marked `*deviation`)
+
+The counter resets automatically whenever the shoe reshuffles.
+
 ## Rules implemented
 
 - Single-player vs dealer
