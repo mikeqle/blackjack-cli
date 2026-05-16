@@ -206,6 +206,7 @@ export function GameApp() {
           canSplit={game.canSplit()}
           splitHelp={game.getSplitHelpText()}
           compact={layout.compact}
+          pendingBet={snapshot.pendingBet}
         />
       </Box>
     </Box>

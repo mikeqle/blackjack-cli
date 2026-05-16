@@ -10,6 +10,7 @@ interface FooterHelpProps {
   canSplit: boolean;
   splitHelp: string;
   compact?: boolean;
+  pendingBet?: number;
 }
 
 export function FooterHelp({
@@ -18,7 +19,8 @@ export function FooterHelp({
   doubleHelp,
   canSplit,
   splitHelp,
-  compact = false
+  compact = false,
+  pendingBet
 }: FooterHelpProps) {
   const key = (value: string) => (
     <Text color="white" bold>
@@ -32,13 +34,24 @@ export function FooterHelp({
 
   const renderBody = () => {
     if (phase === "betting") {
+      const betDisplay = (
+        <Text>
+          <Text color="gray">«</Text>{" "}
+          <Text color="yellowBright" bold>
+            BET ${pendingBet ?? 0}
+          </Text>{" "}
+          <Text color="gray">»</Text>
+        </Text>
+      );
+
       if (compact) {
         return (
           <>
+            {betDisplay}
             <Text>
-              {key("←/→")} <Text>{label("Bet -/+10")}</Text>
+              {key("←/→")} <Text>{label("-/+10")}</Text>
               {separator}
-              {key("↓/↑")} <Text>{label("Bet -/+50")}</Text>
+              {key("↓/↑")} <Text>{label("-/+50")}</Text>
             </Text>
             <Text>
               {key("Enter/Space")} <Text>{label("Deal")}</Text>
@@ -51,14 +64,14 @@ export function FooterHelp({
 
       return (
         <>
+          {betDisplay}
           <Text>
-            {key("←/→")} <Text>{label("Bet -/+10")}</Text>
+            {key("←/→")} <Text>{label("-/+10")}</Text>
             {separator}
-            {key("↓/↑")} <Text>{label("Bet -/+50")}</Text>
+            {key("↓/↑")} <Text>{label("-/+50")}</Text>
             {separator}
             {key("Enter/Space")} <Text>{label("Deal")}</Text>
-          </Text>
-          <Text>
+            {separator}
             {key("q")} <Text>{label("Quit")}</Text>
           </Text>
         </>
