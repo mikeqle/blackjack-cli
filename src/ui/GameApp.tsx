@@ -9,7 +9,7 @@ import { APP_OUTER_PADDING_X, getAppLayout } from "./layout";
 import { StatusPanel } from "./StatusPanel";
 
 const MIN_BET = 10;
-const DECKS = 2;
+const DECKS = 8;
 
 function isHandEndPhase(phase: Phase): boolean {
   return phase === "round_over" || phase === "game_over";

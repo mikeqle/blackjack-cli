@@ -185,6 +185,7 @@ export class BlackjackGame {
 
     const firstCard = hand.cards[0];
     const secondCard = hand.cards[1];
+    const splittingAces = firstCard.rank === "A";
 
     const left: HandState = {
       cards: [firstCard, this.shoe.draw()],
@@ -203,6 +204,13 @@ export class BlackjackGame {
     };
 
     this.playerHands.splice(this.activeHandIndex, 1, left, right);
+
+    if (splittingAces) {
+      this.phase = "dealer_turn";
+      this.message = "Split aces receive one card each. Dealer turn...";
+      return;
+    }
+
     this.message = "Hand split. Play the left hand first.";
   }
 
